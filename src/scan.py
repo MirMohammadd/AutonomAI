@@ -1,14 +1,24 @@
 from torch_geometric.nn import GCNConv,GATConv
 import torch
 from sklearn.cluster import KMeans
+import numpy as np
+
 
 leaky_relu = lambda v,slope=.01: torch.where(v>0,v,slope*v)
 
-
 class KmCluster(KMeans):
-    def __init__(self,k):
+    def __init__(self,k,data):
         super().__init__(k)
         self.k = k
+        self.dataSet = data
+    
+    def _dataPreProcess(self):
+        if isinstance(self.dataSet,np.ndarray):
+            mask = ~np.isnan(self.dataSet)
+            notNan = self.dataSet[mask]
+            return notNan
+        else:
+            return self.dataSet
     
     def _init_model(self):
         self.fit(self.k)
@@ -17,7 +27,8 @@ class KmCluster(KMeans):
     def _get_labels(self):
         return self.labels_
     
-    
+    def pred(self):
+        self.predict()
 
 class VGAEncoder(torch.nn.Module):
     def __init__(self,in_ch,out_ch):

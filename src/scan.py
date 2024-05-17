@@ -8,6 +8,15 @@ leaky_relu = lambda v,slope=.01: torch.where(v>0,v,slope*v)
 class KmCluster(KMeans):
     def __init__(self,k):
         super().__init__(k)
+        self.k = k
+    
+    def _init_model(self):
+        self.fit(self.k)
+        return
+    
+    def _get_labels(self):
+        return self.labels_
+    
     
 
 class VGAEncoder(torch.nn.Module):

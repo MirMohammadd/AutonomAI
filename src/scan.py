@@ -1,7 +1,14 @@
 from torch_geometric.nn import GCNConv,GATConv
 import torch
+from sklearn.cluster import KMeans
 
 leaky_relu = lambda v,slope=.01: torch.where(v>0,v,slope*v)
+
+
+class KmCluster(KMeans):
+    def __init__(self,k):
+        super().__init__(k)
+    
 
 class VGAEncoder(torch.nn.Module):
     def __init__(self,in_ch,out_ch):
@@ -13,4 +20,10 @@ class VGAEncoder(torch.nn.Module):
     def forward(self,x,edge_index):
         x = self.conv1(x,edge_index).relu()
         return self.conv_mu(x, edge_index), self.conv_logstd(x, edge_index)
-    
+
+class GAAEncoder(torch.nn.Module):
+    def __init__(self, in_channels, out_channels):
+        super(GAAEncoder, self).__init__()
+        self.conv1 = GATConv(in_channels, 2 * out_channels, cached=True,heads=1)
+        self.conv2 = GATConv(2 * out_channels, out_channels, cached=True,heads=1)
+

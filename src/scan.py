@@ -25,7 +25,7 @@ class KmCluster(KMeans):
         return
     
     def _get_labels(self):
-        return self.labels_
+        return (self.labels_,self.cluster_centers_)
     
     def pred(self):
         self.predict()
